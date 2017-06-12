@@ -63,13 +63,80 @@ public class algo {
     }
 
 
+    public static void HITS(Map<Integer,ArrayList> graph, Integer k){
 
-    public void HITS(Map graph){
+        int numNodes = dataset.size();
 
-        for(int i=0; i < graph.size(); i++){
+        // Arrays for hub and authority scores.
+        double[] authorityScores = new double[numNodes];
+        double[] hubScores = new double[numNodes];
 
-            Object variable = graph.get(i);
+        // All scores are initially 1.
+        Arrays.fill(authorityScores, 1.0);
+        Arrays.fill(hubScores, 1.0);
 
+        // Run authority update step and hub update step
+        // sequentially for k iterations.
+        for (int i=0; i<k; i++) {
+
+            // Keep track of a normalization value.
+            double norm = 0.0;
+
+            // Update authority scores.
+            for (int j = 0; j < numNodes; j++) {
+
+                // Authority update step: the authority score for a node
+                // is the sum of the hub scores of the nodes that point to it.
+                double authScore = 0.0;
+
+
+                List<Integer> incoming = (List<Integer>) graph.get(j).get(0);
+
+
+                for(int incNei =0; incNei< incoming.size()-1;incNei++){
+                    authScore += hubScores[incNei];
+                }
+
+                authorityScores[j] = authScore;
+                norm += Math.pow(authScore, 2);
+            }
+            // Normalize authority scores.
+            norm = Math.sqrt(norm);
+
+
+            for (int j=0; j<numNodes; j++) {
+                authorityScores[j] = authorityScores[j] / norm;
+            }
+
+            // Set normalization value back to zero.
+            norm = 0.0;
+
+
+            // Update hub scores.
+            for (int j=0; j<numNodes; j++) {
+
+                // Hub update step: the hub score for a node is the sum
+                // of the authority scores of the nodes it points to.
+                double hubScore = 0.0;
+
+                List<Integer> outgoing = (List<Integer>) graph.get(j).get(1);
+                for(int outNei =0; outNei < outgoing.size();outNei++){
+                    hubScore += authorityScores[outNei];
+                }
+
+                hubScores[j] = hubScore;
+                norm += Math.pow(hubScore, 2);
+            }
+
+            // Normalize hub scores.
+            norm = Math.sqrt(norm);
+            for (int j=0; j<numNodes; j++) {
+                hubScores[j] = hubScores[j] / norm;
+
+                System.out.println("Key : "+ j + "HUB : "+ hubScores[j] + " ----  AUTHO : " + authorityScores[j]);
+            }
+
+            System.out.println("-------------------------------------------------");
 
         }
 
@@ -141,10 +208,13 @@ public class algo {
             }
         }
 
+        HITS(dataset,10);
+
+        /*
         for(int i =0 ;i <dataset.size();i++){
 
             System.out.println("Key : " + i + " tab : "+ dataset.get(i));
-        }
+        }*/
 
 
     }
