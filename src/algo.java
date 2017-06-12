@@ -91,12 +91,12 @@ public class algo {
             if(data.getType().equals("e")){
 
                 ArrayList oldValueschild = dataset.get(data.getParam().first);
-                ArrayList oldValuesparent = dataset.get(data.getParam().second);
+                ArrayList oldValuesparent = dataset.get(Integer.parseInt(data.getParam().second));
 
 
                 if( oldValueschild==null){
 
-                    System.out.println("null");
+                    //System.out.println("null");
                     oldValueschild = new ArrayList();
                     List<Integer> enfants = new ArrayList<>();
                     List<Integer> parents = new ArrayList<>();
@@ -107,7 +107,7 @@ public class algo {
                 }
                 if( oldValuesparent==null){
 
-                    System.out.println("null");
+                    //System.out.println("null");
                     oldValuesparent = new ArrayList();
                     List<Integer> enfants = new ArrayList<>();
                     List<Integer> parents = new ArrayList<>();
@@ -118,6 +118,7 @@ public class algo {
 
                 List<Integer> enfants1 = (List<Integer>) oldValueschild.get(0);
                 List<Integer> parents1 = (List<Integer>) oldValueschild.get(1);
+
 
                 List<Integer> enfants2 = (List<Integer>) oldValuesparent.get(0);
                 List<Integer> parents2 = (List<Integer>) oldValuesparent.get(1);
@@ -140,8 +141,10 @@ public class algo {
             }
         }
 
-        System.out.println(dataset.get(0));
+        for(int i =0 ;i <dataset.size();i++){
 
+            System.out.println("Key : " + i + " tab : "+ dataset.get(i));
+        }
 
 
     }
