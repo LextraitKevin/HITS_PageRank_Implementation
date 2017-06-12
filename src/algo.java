@@ -6,7 +6,12 @@ import java.util.*;
  */
 public class algo {
 
-    public Map<Integer,Integer> map = new HashMap<Integer,Integer>();
+    public List dataFiles = new ArrayList();
+
+    private void readfile(){
+
+        
+    }
 
 
 
