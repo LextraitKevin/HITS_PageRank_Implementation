@@ -1,0 +1,13 @@
+n 0 http://www.berkeley.edu/
+n 1 http://www.caltech.edu/
+n 2 http://www.realestatenet.com/
+n 3 http://www.ucsb.edu/
+n 4 http://www.washingtonpost.com/wp-srv/national/longterm/50states/ca.htm
+e 0 4
+e 0 3
+e 2 3
+e 3 4
+e 4 1
+e 0 2
+e 4 0
+e 2 0
