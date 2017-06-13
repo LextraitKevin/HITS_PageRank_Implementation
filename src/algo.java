@@ -9,7 +9,7 @@ import java.io.IOException;
  */
 public class algo {
 
-    private static final String FILENAME = "gr0.California2.txt";
+    private static final String FILENAME = "gr0.California.txt";
 
     public static List dataFiles = new ArrayList();
 
@@ -67,9 +67,13 @@ public class algo {
 
         int numNodes = dataset.size();
 
+        Integer maxKey = Collections.max(graph.keySet());
+
+
+        System.out.println(maxKey);
         // Arrays for hub and authority scores.
-        double[] authorityScores = new double[numNodes];
-        double[] hubScores = new double[numNodes];
+        double[] authorityScores = new double[maxKey+1];
+        double[] hubScores = new double[maxKey+1];
 
         // All scores are initially 1.
         Arrays.fill(authorityScores, 1.0);
@@ -83,21 +87,27 @@ public class algo {
             double norm = 0.0;
 
             // Update authority scores.
-            for (int j = 0; j < numNodes; j++) {
+
+            for(Map.Entry<Integer, ArrayList> entry : graph.entrySet()){
+                Integer key = entry.getKey();
+                ArrayList value = entry.getValue();
+            //for (int j = 0; j < numNodes; j++) {
 
                 // Authority update step: the authority score for a node
                 // is the sum of the hub scores of the nodes that point to it.
                 double authScore = 0.0;
 
+                List<Integer> incoming = (List<Integer>) graph.get(key).get(0);
 
-                List<Integer> incoming = (List<Integer>) graph.get(j).get(0);
 
-
-                for(int incNei =0; incNei< incoming.size()-1;incNei++){
-                    authScore += hubScores[incNei];
+                if(incoming!=null) {
+                    for (int incNei = 0; incNei < incoming.size() - 1; incNei++) {
+                        authScore += hubScores[incNei];
+                    }
                 }
 
-                authorityScores[j] = authScore;
+
+                authorityScores[key] = authScore;
                 norm += Math.pow(authScore, 2);
             }
             // Normalize authority scores.
@@ -113,27 +123,36 @@ public class algo {
 
 
             // Update hub scores.
-            for (int j=0; j<numNodes; j++) {
+
+            for(Map.Entry<Integer, ArrayList> entry : graph.entrySet()){
+                Integer key = entry.getKey();
+                ArrayList value = entry.getValue();
+            //for (int j=0; j<numNodes; j++) {
 
                 // Hub update step: the hub score for a node is the sum
                 // of the authority scores of the nodes it points to.
                 double hubScore = 0.0;
 
-                List<Integer> outgoing = (List<Integer>) graph.get(j).get(1);
-                for(int outNei =0; outNei < outgoing.size();outNei++){
-                    hubScore += authorityScores[outNei];
+                List<Integer> outgoing = (List<Integer>) graph.get(key).get(1);
+                if(outgoing!=null) {
+                    for (int outNei = 0; outNei < outgoing.size(); outNei++) {
+                        hubScore += authorityScores[outNei];
+                    }
                 }
 
-                hubScores[j] = hubScore;
+                hubScores[key] = hubScore;
                 norm += Math.pow(hubScore, 2);
             }
 
             // Normalize hub scores.
             norm = Math.sqrt(norm);
-            for (int j=0; j<numNodes; j++) {
-                hubScores[j] = hubScores[j] / norm;
+            for(Map.Entry<Integer, ArrayList> entry : graph.entrySet()){
+                Integer key = entry.getKey();
+                ArrayList value = entry.getValue();
+            //for (int j=0; j<numNodes; j++) {
+                hubScores[key] = hubScores[key] / norm;
 
-                System.out.println("Key : "+ j + "HUB : "+ hubScores[j] + " ----  AUTHO : " + authorityScores[j]);
+                System.out.println("Key : "+ key + " HUB : "+ hubScores[key] + " ----  AUTHO : " + authorityScores[key]);
             }
 
             System.out.println("-------------------------------------------------");
@@ -142,6 +161,8 @@ public class algo {
 
 
     }
+
+
 
 
     public static void main(String [] args){
