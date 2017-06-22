@@ -163,42 +163,55 @@ public class algo {
     }
 
 
-    public static void getAdjMatric(Map<Integer,ArrayList> graph){
+    public static Integer[][] getAdjMatric(Map<Integer,ArrayList> graph){
 
         Integer maxKey = Collections.max(graph.keySet());
+        System.out.println("max key"+ maxKey);
 
 
-        Integer[][] Adjmatrix = new Integer[maxKey][maxKey-1];
+        Integer[][] Adjmatrix = new Integer[maxKey+1][maxKey+1];
+
+        List<Integer> outgoing = new ArrayList<>();
 
         int it=0;
 
-        for(int i=0 ; i< maxKey ;i++) {
+        for(int i=0 ; i<= maxKey ;i++) {
 
-
-            System.out.println(i);
+            outgoing.clear();
 
             try {
-                List<Integer> outgoing = (List<Integer>) graph.get(i).get(0);
+               outgoing = (List<Integer>) graph.get(i).get(0);
             }catch (NullPointerException exep){
 
             }
 
-            for(int j=0;j<maxKey-1;j++){
-                //System.out.println(j);
-
-
+            for(int j=0;j<=maxKey;j++){
                 Adjmatrix[it][j]=0;
-                //System.out.println(Adjmatrix[it][i]);
             }
 
-            System.out.println("--------------------------------------------------------");
-
-
+            for(int k=0;k<outgoing.size();k++) {
+                Adjmatrix[it][outgoing.get(k)]=1;
+            }
 
             it++;
         }
 
 
+        return Adjmatrix;
+
+    }
+
+
+    public static void showAdjMatrix(Integer[][] Adjmatrix , int maxKey){
+
+        for(int i=0 ; i<= maxKey ;i++) {
+
+            for(int j=0;j<=maxKey;j++) {
+                System.out.println(Adjmatrix[i][j]);
+            }
+            System.out.println("-------");
+
+        }
     }
 
 
@@ -207,6 +220,8 @@ public class algo {
     public static void main(String [] args){
 
         readfile();
+
+        Integer[][] AdjMatrix;
 
 
 
@@ -270,7 +285,9 @@ public class algo {
 
         //HITS(dataset,10);
 
-        getAdjMatric(dataset);
+        AdjMatrix = getAdjMatric(dataset);
+
+        showAdjMatrix(AdjMatrix, Collections.max(dataset.keySet()));
 
         /*
         for(int i =0 ;i <dataset.size();i++){
