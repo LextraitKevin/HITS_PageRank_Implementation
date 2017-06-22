@@ -62,6 +62,89 @@ public class algo {
 
     }
 
+    public static void calc(Integer totalNodes, Integer[][] AdjMatrix){
+
+        double InitialPageRank;
+        double OutgoingLinks=0;
+        double DampingFactor = 0.85;
+        double TempPageRank[] = new double[totalNodes+1];
+        double pagerank[] = new double[totalNodes+1];
+        totalNodes = totalNodes + 1 ;
+
+        int ExternalNodeNumber;
+        int InternalNodeNumber;
+        int k=1; // For Traversing
+        int ITERATION_STEP=1;
+
+        InitialPageRank = 1/Double.parseDouble(totalNodes.toString());
+        System.out.printf(" Total Number of Nodes :"+totalNodes+"\t Initial PageRank  of All Nodes :"+InitialPageRank+"\n");
+
+// 0th ITERATION  _ OR _ INITIALIZATION PHASE
+        for(k=0;k<totalNodes;k++)
+        {
+            pagerank[k]=InitialPageRank;
+        }
+
+        System.out.printf("\n Initial PageRank Values , 0th Step \n");
+        for(k=0;k<totalNodes;k++)
+        {
+            System.out.printf(" Page Rank of "+k+" is :\t"+pagerank[k]+"\n");
+        }
+
+        while(ITERATION_STEP<=2) // Iterations
+        {
+            // Store the PageRank for All Nodes in Temporary Array
+            for(k=0;k<totalNodes;k++)
+            {
+                TempPageRank[k]=pagerank[k];
+                pagerank[k]=0;
+            }
+
+            for(InternalNodeNumber=0;InternalNodeNumber<totalNodes;InternalNodeNumber++)
+            {
+                for(ExternalNodeNumber=0;ExternalNodeNumber<totalNodes;ExternalNodeNumber++)
+                {
+                    if(AdjMatrix[ExternalNodeNumber][InternalNodeNumber] == 1)
+                    {
+                        k=0;
+                        OutgoingLinks=0;  // Count the Number of Outgoing Links for each ExternalNodeNumber
+                        while(k<totalNodes)
+                        {
+                            if(AdjMatrix[ExternalNodeNumber][k] == 1 )
+                            {
+                                OutgoingLinks=OutgoingLinks+1; // Counter for Outgoing Links
+                            }
+                            k=k+1;
+                        }
+                        // Calculate PageRank
+                        pagerank[InternalNodeNumber]+=TempPageRank[ExternalNodeNumber]*(1/OutgoingLinks);
+                    }
+                }
+            }
+
+            System.out.printf("\n After "+ITERATION_STEP+"th Step \n");
+
+            for(k=0;k<totalNodes;k++)
+                System.out.printf(" Page Rank of "+k+" is :\t"+pagerank[k]+"\n");
+
+            ITERATION_STEP = ITERATION_STEP+1;
+        }
+
+// Add the Damping Factor to PageRank
+        for(k=0;k<totalNodes;k++)
+        {
+            pagerank[k]=(1-DampingFactor)+ DampingFactor*pagerank[k];
+        }
+
+// Display PageRank
+        System.out.printf("\n Final Page Rank : \n");
+        for(k=0;k<totalNodes;k++)
+        {
+            System.out.printf(" Page Rank of "+k+" is :\t"+pagerank[k]+"\n");
+        }
+
+    }
+
 
     public static void HITS(Map<Integer,ArrayList> graph, Integer k){
 
@@ -287,7 +370,11 @@ public class algo {
 
         AdjMatrix = getAdjMatric(dataset);
 
-        showAdjMatrix(AdjMatrix, Collections.max(dataset.keySet()));
+        Integer maxKey = Collections.max(dataset.keySet());
+
+        showAdjMatrix(AdjMatrix, maxKey);
+
+        calc(maxKey,AdjMatrix);
 
         /*
         for(int i =0 ;i <dataset.size();i++){
