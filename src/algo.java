@@ -9,7 +9,7 @@ import java.io.IOException;
  */
 public class algo {
 
-    private static final String FILENAME = "gr0.California.txt";
+    private static final String FILENAME = "gr0.California2.txt";
 
     public static List dataFiles = new ArrayList();
 
@@ -97,7 +97,7 @@ public class algo {
                 // is the sum of the hub scores of the nodes that point to it.
                 double authScore = 0.0;
 
-                List<Integer> incoming = (List<Integer>) graph.get(key).get(0);
+                List<Integer> incoming = (List<Integer>) graph.get(key).get(1);
 
 
                 if(incoming!=null) {
@@ -133,7 +133,7 @@ public class algo {
                 // of the authority scores of the nodes it points to.
                 double hubScore = 0.0;
 
-                List<Integer> outgoing = (List<Integer>) graph.get(key).get(1);
+                List<Integer> outgoing = (List<Integer>) graph.get(key).get(0);
                 if(outgoing!=null) {
                     for (int outNei = 0; outNei < outgoing.size(); outNei++) {
                         hubScore += authorityScores[outNei];
@@ -157,6 +157,45 @@ public class algo {
 
             System.out.println("-------------------------------------------------");
 
+        }
+
+
+    }
+
+
+    public static void getAdjMatric(Map<Integer,ArrayList> graph){
+
+        Integer maxKey = Collections.max(graph.keySet());
+
+
+        Integer[][] Adjmatrix = new Integer[maxKey][maxKey-1];
+
+        int it=0;
+
+        for(int i=0 ; i< maxKey ;i++) {
+
+
+            System.out.println(i);
+
+            try {
+                List<Integer> outgoing = (List<Integer>) graph.get(i).get(0);
+            }catch (NullPointerException exep){
+
+            }
+
+            for(int j=0;j<maxKey-1;j++){
+                //System.out.println(j);
+
+
+                Adjmatrix[it][j]=0;
+                //System.out.println(Adjmatrix[it][i]);
+            }
+
+            System.out.println("--------------------------------------------------------");
+
+
+
+            it++;
         }
 
 
@@ -229,7 +268,9 @@ public class algo {
             }
         }
 
-        HITS(dataset,10);
+        //HITS(dataset,10);
+
+        getAdjMatric(dataset);
 
         /*
         for(int i =0 ;i <dataset.size();i++){
