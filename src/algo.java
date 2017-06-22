@@ -12,133 +12,108 @@ public class algo {
     private static final String FILENAME = "gr0.California2.txt";
 
     public static List dataFiles = new ArrayList();
-
-
     public static Map<Integer,ArrayList> dataset = new HashMap<>();
 
+    //Sample file reading
     private static void readfile(){
 
         BufferedReader br=null;
         FileReader fr=null;
 
         try {
-
             fr = new FileReader(FILENAME);
             br = new BufferedReader(fr);
-
             String sCurrentLine;
-
             br = new BufferedReader(new FileReader(FILENAME));
-
             while ((sCurrentLine = br.readLine()) != null) {
-
                 String[] tab = sCurrentLine.split("\\s+");
                 DataFile data = new DataFile(tab[0],Integer.parseInt(tab[1]),tab[2]);
-
                 dataFiles.add(data);
             }
-
         } catch (IOException e) {
-
             e.printStackTrace();
-
         } finally {
-
             try {
-
                 if (br != null)
                     br.close();
-
                 if (fr != null)
                     fr.close();
-
             } catch (IOException ex) {
-
                 ex.printStackTrace();
-
             }
-
         }
-
     }
 
-    public static void calc(Integer totalNodes, Integer[][] AdjMatrix){
+    public static void calc(Integer maxKeys, Integer[][] AdjMatrix){
 
         double InitialPageRank;
         double OutgoingLinks=0;
         double DampingFactor = 0.85;
-        double TempPageRank[] = new double[totalNodes+1];
-        double pagerank[] = new double[totalNodes+1];
-        totalNodes = totalNodes + 1 ;
+        double TempPageRank[] = new double[maxKeys+1];
+        double pagerank[] = new double[maxKeys+1];
+        maxKeys = maxKeys + 1 ;
 
-        int ExternalNodeNumber;
-        int InternalNodeNumber;
-        int k=1; // For Traversing
-        int ITERATION_STEP=1;
+        int col;
+        int row;
+        int k=1;
+        int step=1;
 
-        InitialPageRank = 1/Double.parseDouble(totalNodes.toString());
-        System.out.printf(" Total Number of Nodes :"+totalNodes+"\t Initial PageRank  of All Nodes :"+InitialPageRank+"\n");
+        InitialPageRank = 1/Double.parseDouble(maxKeys.toString());
+        System.out.printf("Initial PageRank  :"+InitialPageRank+"\n");
 
-// 0th ITERATION  _ OR _ INITIALIZATION PHASE
-        for(k=0;k<totalNodes;k++)
+
+        for(k=0;k<maxKeys;k++)
         {
             pagerank[k]=InitialPageRank;
         }
-
         System.out.printf("\n Initial PageRank Values , 0th Step \n");
-        for(k=0;k<totalNodes;k++)
+        for(k=0;k<maxKeys;k++)
         {
             System.out.printf(" Page Rank of "+k+" is :\t"+pagerank[k]+"\n");
         }
-
-        while(ITERATION_STEP<=2) // Iterations
+        while(step<=2) // Iterations
         {
-            // Store the PageRank for All Nodes in Temporary Array
-            for(k=0;k<totalNodes;k++)
+            for(k=0;k<maxKeys;k++)
             {
                 TempPageRank[k]=pagerank[k];
                 pagerank[k]=0;
             }
-
-            for(InternalNodeNumber=0;InternalNodeNumber<totalNodes;InternalNodeNumber++)
+            for(row=0;row<maxKeys;row++)
             {
-                for(ExternalNodeNumber=0;ExternalNodeNumber<totalNodes;ExternalNodeNumber++)
+                for(col=0;col<maxKeys;col++)
                 {
-                    if(AdjMatrix[ExternalNodeNumber][InternalNodeNumber] == 1)
+                    if(AdjMatrix[col][row] == 1)
                     {
                         k=0;
-                        OutgoingLinks=0;  // Count the Number of Outgoing Links for each ExternalNodeNumber
-                        while(k<totalNodes)
+                        OutgoingLinks=0;
+                        while(k<maxKeys)
                         {
-                            if(AdjMatrix[ExternalNodeNumber][k] == 1 )
+                            if(AdjMatrix[col][k] == 1 )
                             {
-                                OutgoingLinks=OutgoingLinks+1; // Counter for Outgoing Links
+                                OutgoingLinks=OutgoingLinks+1;
                             }
                             k=k+1;
                         }
                         // Calculate PageRank
-                        pagerank[InternalNodeNumber]+=TempPageRank[ExternalNodeNumber]*(1/OutgoingLinks);
+                        pagerank[row]+=TempPageRank[col]*(1/OutgoingLinks);
                     }
                 }
             }
 
-            System.out.printf("\n After "+ITERATION_STEP+"th Step \n");
-
-            for(k=0;k<totalNodes;k++)
+            System.out.printf("\n After "+step+"th Step \n");
+            for(k=0;k<maxKeys;k++)
                 System.out.printf(" Page Rank of "+k+" is :\t"+pagerank[k]+"\n");
-
-            ITERATION_STEP = ITERATION_STEP+1;
+            step = step+1;
         }
 
-// Add the Damping Factor to PageRank
-        for(k=0;k<totalNodes;k++)
+        //Damping Factor
+        for(k=0;k<maxKeys;k++)
         {
             pagerank[k]=(1-DampingFactor)+ DampingFactor*pagerank[k];
         }
 
-// Display PageRank
         System.out.printf("\n Final Page Rank : \n");
-        for(k=0;k<totalNodes;k++)
+        for(k=0;k<maxKeys;k++)
         {
             System.out.printf(" Page Rank of "+k+" is :\t"+pagerank[k]+"\n");
         }
@@ -147,110 +122,78 @@ public class algo {
 
 
     public static void HITS(Map<Integer,ArrayList> graph, Integer k){
-
+        //En commentaires : pseudo code de Wikipédia
         int numNodes = dataset.size();
-
         Integer maxKey = Collections.max(graph.keySet());
 
-
-        System.out.println(maxKey);
-        // Arrays for hub and authority scores.
         double[] authorityScores = new double[maxKey+1];
         double[] hubScores = new double[maxKey+1];
 
-        // All scores are initially 1.
-        Arrays.fill(authorityScores, 1.0);
-        Arrays.fill(hubScores, 1.0);
+        Arrays.fill(authorityScores, 1.0); // p.auth = 1 // p.auth is the authority score of the page p
+        Arrays.fill(hubScores, 1.0);    // p.hub = 1 // p.hub is the hub score of the page p
 
-        // Run authority update step and hub update step
-        // sequentially for k iterations.
-        for (int i=0; i<k; i++) {
 
-            // Keep track of a normalization value.
+        for (int i=0; i<k; i++) {   //for step from 1 to k do // run the algorithm for k steps
+
             double norm = 0.0;
 
-            // Update authority scores.
-
-            for(Map.Entry<Integer, ArrayList> entry : graph.entrySet()){
+            for(Map.Entry<Integer, ArrayList> entry : graph.entrySet()){    //for each page p in G do  // update all authority values first
                 Integer key = entry.getKey();
                 ArrayList value = entry.getValue();
-            //for (int j = 0; j < numNodes; j++) {
 
-                // Authority update step: the authority score for a node
-                // is the sum of the hub scores of the nodes that point to it.
                 double authScore = 0.0;
-
                 List<Integer> incoming = (List<Integer>) graph.get(key).get(1);
 
-
                 if(incoming!=null) {
-                    for (int incNei = 0; incNei < incoming.size() - 1; incNei++) {
-                        authScore += hubScores[incNei];
+                    for (int incNei = 0; incNei < incoming.size() - 1; incNei++) {  //for each page q in p.incomingNeighbors do // p.incomingNeighbors is the set of pages that link to p
+                        authScore += hubScores[incNei]; //p.auth += q.hub
                     }
                 }
 
-
                 authorityScores[key] = authScore;
-                norm += Math.pow(authScore, 2);
+                norm += Math.pow(authScore, 2); //norm += square(p.auth) // calculate the sum of the squared auth values to normalise
             }
-            // Normalize authority scores.
+
             norm = Math.sqrt(norm);
 
-
-            for (int j=0; j<numNodes; j++) {
-                authorityScores[j] = authorityScores[j] / norm;
+            for (int j=0; j<numNodes; j++) {    //for each page p in G do  // update the auth scores
+                authorityScores[j] = authorityScores[j] / norm; // p.auth = p.auth / norm  // normalise the auth values
             }
 
-            // Set normalization value back to zero.
             norm = 0.0;
 
-
-            // Update hub scores.
-
-            for(Map.Entry<Integer, ArrayList> entry : graph.entrySet()){
+            for(Map.Entry<Integer, ArrayList> entry : graph.entrySet()){    //for each page p in G do  // then update all hub values
                 Integer key = entry.getKey();
                 ArrayList value = entry.getValue();
-            //for (int j=0; j<numNodes; j++) {
 
-                // Hub update step: the hub score for a node is the sum
-                // of the authority scores of the nodes it points to.
-                double hubScore = 0.0;
+                double hubScore = 0.0;  //p.hub = 0
 
                 List<Integer> outgoing = (List<Integer>) graph.get(key).get(0);
                 if(outgoing!=null) {
-                    for (int outNei = 0; outNei < outgoing.size(); outNei++) {
+                    for (int outNei = 0; outNei < outgoing.size(); outNei++) {   //for each page r in p.outgoingNeighbors do // p.outgoingNeighbors is the set of pages
                         hubScore += authorityScores[outNei];
                     }
                 }
 
                 hubScores[key] = hubScore;
-                norm += Math.pow(hubScore, 2);
+                norm += Math.pow(hubScore, 2);  //norm = sqrt(norm)
             }
 
-            // Normalize hub scores.
             norm = Math.sqrt(norm);
-            for(Map.Entry<Integer, ArrayList> entry : graph.entrySet()){
+            for(Map.Entry<Integer, ArrayList> entry : graph.entrySet()){    // for each page p in G do  // then update all hub values
                 Integer key = entry.getKey();
-                ArrayList value = entry.getValue();
-            //for (int j=0; j<numNodes; j++) {
-                hubScores[key] = hubScores[key] / norm;
+                hubScores[key] = hubScores[key] / norm; //p.hub = p.hub / norm   // normalise the hub values
 
                 System.out.println("Key : "+ key + " HUB : "+ hubScores[key] + " ----  AUTHO : " + authorityScores[key]);
             }
-
             System.out.println("-------------------------------------------------");
-
         }
-
-
     }
 
 
     public static Integer[][] getAdjMatric(Map<Integer,ArrayList> graph){
 
         Integer maxKey = Collections.max(graph.keySet());
-        System.out.println("max key"+ maxKey);
-
 
         Integer[][] Adjmatrix = new Integer[maxKey+1][maxKey+1];
 
@@ -259,26 +202,20 @@ public class algo {
         int it=0;
 
         for(int i=0 ; i<= maxKey ;i++) {
-
             outgoing.clear();
-
             try {
-               outgoing = (List<Integer>) graph.get(i).get(0);
+                outgoing = (List<Integer>) graph.get(i).get(0);
             }catch (NullPointerException exep){
 
             }
-
             for(int j=0;j<=maxKey;j++){
                 Adjmatrix[it][j]=0;
             }
-
             for(int k=0;k<outgoing.size();k++) {
                 Adjmatrix[it][outgoing.get(k)]=1;
             }
-
             it++;
         }
-
 
         return Adjmatrix;
 
@@ -366,25 +303,17 @@ public class algo {
             }
         }
 
-        //HITS(dataset,10);
-
+        System.out.println("\n \n ****************************************   Algorithme HITS  ******************************************* \n");
+        HITS(dataset,10);
         AdjMatrix = getAdjMatric(dataset);
-
         Integer maxKey = Collections.max(dataset.keySet());
+        //showAdjMatrix(AdjMatrix, maxKey);
 
-        showAdjMatrix(AdjMatrix, maxKey);
-
+        System.out.println("\n \n ****************************************  Algorithme PageRank ******************************************* \n");
         calc(maxKey,AdjMatrix);
 
-        /*
-        for(int i =0 ;i <dataset.size();i++){
 
-            System.out.println("Key : " + i + " tab : "+ dataset.get(i));
-        }*/
 
 
     }
 }
-
-
-
